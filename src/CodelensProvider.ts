@@ -42,9 +42,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     token: vscode.CancellationToken
   ): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
     if (
-      vscode.workspace
-        .getConfiguration("code-text-lens")
-        .get("enableCodeLens", true)
+      vscode.workspace.getConfiguration("code-lens").get("enableCodeLens", true)
     ) {
       this.codeLenses = [];
       const text = document.getText();
@@ -79,7 +77,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
         const command = new vscode.CodeLens(range, {
           title: `${label.label}`,
           tooltip: "asdf",
-          command: "code-text-lens.codelensAction",
+          command: "code-lens.codelensAction",
           arguments: [label.label],
         });
         this.codeLenses.push(command);
@@ -94,9 +92,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     token: vscode.CancellationToken
   ) {
     if (
-      vscode.workspace
-        .getConfiguration("code-text-lens")
-        .get("enableCodeLens", true)
+      vscode.workspace.getConfiguration("code-lens").get("enableCodeLens", true)
     ) {
       return codeLens;
     }

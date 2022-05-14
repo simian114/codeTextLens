@@ -29,19 +29,19 @@ export function activate(context: ExtensionContext) {
   const filePath = path.join(root, "src/util/codeText.json");
   const jsonFile = fs.readFileSync(filePath, "utf8");
   languages.registerCodeLensProvider("*", codelensProvider);
-  commands.registerCommand("code-text-lens.enableCodeLens", () => {
+  commands.registerCommand("code-lens.enableCodeLens", () => {
     workspace
-      .getConfiguration("code-text-lens")
+      .getConfiguration("code-lens")
       .update("enableCodeLens", true, true);
   });
 
-  commands.registerCommand("code-text-lens.disableCodeLens", () => {
+  commands.registerCommand("code-lens.disableCodeLens", () => {
     workspace
-      .getConfiguration("code-text-lens")
+      .getConfiguration("code-lens")
       .update("enableCodeLens", false, true);
   });
 
-  commands.registerCommand("code-text-lens.codelensAction", (args: any) => {
+  commands.registerCommand("code-lens.codelensAction", (args: any) => {
     workspace.openTextDocument(filePath).then((doc) => {
       const indexOf = jsonFile.indexOf(args);
       const line = doc.lineAt(doc.positionAt(indexOf).line);

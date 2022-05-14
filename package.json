@@ -1,5 +1,5 @@
 {
-	"name": "code-text-lens",
+	"name": "code-lens",
 	"displayName": "codeTextLens",
 	"description": "codeTextLens",
 	"version": "0.0.1",
@@ -12,7 +12,7 @@
 		"email": "simian114@gmail.com",
 		"url": "https://github.com/simian114"
 	},
-	"publisher": "sanam",
+	"publisher": "namSSang",
 	"engines": {
 		"vscode": "^1.67.0"
 	},
@@ -27,18 +27,18 @@
 		"commands": [
 			{
 				"title": "Enable CodeLens",
-				"command": "code-text-lens.enableCodeLens",
+				"command": "code-lens.enableCodeLens",
 				"category": "codeText"
 			},
 			{
 				"title": "Disable Codelens",
-				"command": "code-text-lens.disableCodeLens",
+				"command": "code-lens.disableCodeLens",
 				"category": "codeText"
 			}
 		],
 		"configuration": {
 			"properties": {
-				"code-text-lens.enableCodeLens": {
+				"code-lens.enableCodeLens": {
 					"type": "boolean",
 					"default": false
 				}
