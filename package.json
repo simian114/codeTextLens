@@ -1,8 +1,8 @@
 {
-	"name": "code-lens",
+	"name": "code-text-lens",
 	"displayName": "codeTextLens",
 	"description": "codeTextLens",
-	"version": "0.0.1",
+	"version": "0.0.3",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/simian114/codeTextLens"
@@ -20,7 +20,9 @@
 		"Other"
 	],
 	"activationEvents": [
-		"*"
+		"onCommand:code-lens.enableCodeLens",
+		"onCommand:code-lens.disableCodeLens",
+		"onCommand:code-lens.codelensAction"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
