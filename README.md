@@ -16,6 +16,7 @@
 ![openFile](https://user-images.githubusercontent.com/49119625/168428113-ea779a66-0d1b-408f-9958-8df8b2b831d3.gif)
 
 > Tip: 사진의 단축키로 빠르게 이동가능
+
 ![스크린샷 2022-05-14 오후 10 36 05](https://user-images.githubusercontent.com/49119625/168428131-7193f535-fa70-4f16-9dd3-7d2d87b88e87.png)
 
 
