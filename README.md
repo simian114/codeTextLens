@@ -3,7 +3,7 @@
 스터너를 위한 CodeText LENS
 
 ## How to
-`command palette` 에서 `enable Codelens` 
+`command palette` 에서 `enable Codelens` 실행
 
 ## Features
 
