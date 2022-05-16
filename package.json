@@ -39,10 +39,24 @@
 			}
 		],
 		"configuration": {
+			"title": "CodeTextLens",
 			"properties": {
-				"code-lens.enableCodeLens": {
+				"CodeTextLens.enabled": {
 					"type": "boolean",
-					"default": false
+					"default": true
+				},
+				"CodeTextLens.gelato": {
+					"type": "string",
+					"default": "/src/util/codeText.json"
+				},
+				"CodeTextLens.waffle": {
+					"type": "string",
+					"default": "/src/utils/codeText.json"
+				},
+				"CodeTextLens.cursorHover": {
+					"type": "boolean",
+					"default": false,
+					"description": "커서를 올리면 나옴"
 				}
 			}
 		}

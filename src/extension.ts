@@ -9,14 +9,17 @@ import {
   Selection,
   Range,
 } from "vscode";
+import * as vscode from "vscode";
 import { CodelensProvider } from "./CodelensProvider";
 import * as path from "path";
 import * as fs from "fs";
+import { getCodeTextPath, getFilePath, getProjectName } from "./util";
 
 let disposables: Disposable[] = [];
 
 function getProjectRoot() {
   const root = window?.activeTextEditor?.document?.uri;
+  //
   if (!root) {
     return "";
   }
@@ -25,13 +28,32 @@ function getProjectRoot() {
 
 export function activate(context: ExtensionContext) {
   const codelensProvider = new CodelensProvider();
+  let workspaceFolders: ReadonlyArray<vscode.WorkspaceFolder> | undefined =
+    vscode.workspace.workspaceFolders;
+  const codes: { gelato: string; waffle: string } = {
+    gelato: "",
+    waffle: "",
+  };
+  workspaceFolders?.forEach((workspaceFolder) => {
+    if (
+      workspaceFolder.name !== "gelato" &&
+      workspaceFolder.name !== "waffle"
+    ) {
+      return;
+    }
+    const name = workspaceFolder.name;
+    const filePath = path.join(
+      workspaceFolder.uri.fsPath,
+      getFilePath(workspaceFolder.name)
+    );
+    const jsonFile = fs.readFileSync(filePath, "utf8");
+    codes[name] = jsonFile;
+  });
   const root = getProjectRoot();
-  const filePath = path.join(root, "src/util/codeText.json");
-  const jsonFile = fs.readFileSync(filePath, "utf8");
   languages.registerCodeLensProvider("*", codelensProvider);
   commands.registerCommand("code-lens.enableCodeLens", () => {
     workspace
-      .getConfiguration("code-lens")
+      .getConfiguration("CodeTextLens.enabled")
       .update("enableCodeLens", true, true);
   });
 
@@ -42,8 +64,13 @@ export function activate(context: ExtensionContext) {
   });
 
   commands.registerCommand("code-lens.codelensAction", (args: any) => {
-    workspace.openTextDocument(filePath).then((doc) => {
-      const indexOf = jsonFile.indexOf(args);
+    const codeTextPath = getCodeTextPath();
+    workspace.openTextDocument(codeTextPath).then((doc) => {
+      const project = getProjectName();
+      if (!project) {
+        return;
+      }
+      const indexOf = codes[project].indexOf(args);
       const line = doc.lineAt(doc.positionAt(indexOf).line);
       const position = new Position(line.lineNumber, line.lineNumber);
       window.showTextDocument(doc).then((editor) => {

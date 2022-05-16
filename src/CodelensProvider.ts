@@ -1,17 +1,23 @@
 import * as path from "path";
 import * as fs from "fs";
 import * as vscode from "vscode";
+import { getFilePath } from "./util";
 
 /**
  * CodelensProvider
  */
 // eslint-disable-next-line @typescript-eslint/naming-convention
 type obj = Record<string, unknown>;
+type CodeText = Array<{ label: string; labelKey: string }>;
+
 export class CodelensProvider implements vscode.CodeLensProvider {
   private codeLenses: vscode.CodeLens[] = [];
   private funcName: RegExp = new RegExp(/window.getCodeText/i);
   private codeTextLabelRegex: RegExp = new RegExp(/\'\w+\.\w+.\w+\'/g);
-  private codes: Array<{ label: string; labelKey: string }> = [];
+  private temps: { gelato: CodeText; waffle: CodeText } = {
+    gelato: [],
+    waffle: [],
+  };
   //
   private _onDidChangeCodeLenses: vscode.EventEmitter<void> =
     new vscode.EventEmitter<void>();
@@ -22,16 +28,25 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     this._onDidChangeCodeLenses.fire();
     let workspaceFolders: ReadonlyArray<vscode.WorkspaceFolder> | undefined =
       vscode.workspace.workspaceFolders;
-    if (workspaceFolders) {
-      const root = workspaceFolders[0] as vscode.WorkspaceFolder;
-      const filePath = path.join(root.uri.fsPath, "src/util/codeText.json");
+    workspaceFolders?.forEach((workspaceFolder: vscode.WorkspaceFolder) => {
+      if (
+        workspaceFolder.name !== "gelato" &&
+        workspaceFolder.name !== "waffle"
+      ) {
+        return;
+      }
+      const filePath = path.join(
+        workspaceFolder.uri.fsPath,
+        getFilePath(workspaceFolder.name)
+      );
       const jsonFile = fs.readFileSync(filePath, "utf8");
       const jsonData: {
         data: Array<{ label: string; labelKey: string }>;
         modified: boolean;
       } = JSON.parse(jsonFile);
-      this.codes = jsonData.data;
-    }
+      this.temps[workspaceFolder.name] = jsonData.data;
+    });
+
     vscode.workspace.onDidChangeConfiguration((_) => {
       this._onDidChangeCodeLenses.fire();
     });
@@ -42,9 +57,24 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     token: vscode.CancellationToken
   ): vscode.CodeLens[] | Thenable<vscode.CodeLens[]> {
     if (
-      vscode.workspace.getConfiguration("code-lens").get("enableCodeLens", true)
+      vscode.workspace.getConfiguration("CodeTextLens").get("enabled", true)
     ) {
       this.codeLenses = [];
+      const root = vscode.window?.activeTextEditor?.document?.uri;
+      if (!root) {
+        return [];
+      }
+      const currentWorkFolder = vscode.workspace.getWorkspaceFolder(root);
+      if (!currentWorkFolder) {
+        return [];
+      }
+      if (
+        currentWorkFolder.name !== "gelato" &&
+        currentWorkFolder.name !== "waffle"
+      ) {
+        return [];
+      }
+      const codes = this.temps[currentWorkFolder.name];
       const text = document.getText();
       let matches;
       while ((matches = this.codeTextLabelRegex.exec(text)) !== null) {
@@ -70,13 +100,13 @@ export class CodelensProvider implements vscode.CodeLensProvider {
           continue;
         }
         const trimmed = matches[0].replace(/\'/g, "");
-        const label = this.codes.find((code) => code.labelKey === trimmed);
+        const label = codes.find((code) => code.labelKey === trimmed);
         if (!label) {
           continue;
         }
         const command = new vscode.CodeLens(range, {
           title: `${label.label}`,
-          tooltip: "asdf",
+          tooltip: "하하호호",
           command: "code-lens.codelensAction",
           arguments: [label.label],
         });
