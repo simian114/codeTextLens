@@ -3,6 +3,7 @@
 스터너를 위한 CodeText LENS
 
 ## How to
+
 `command palette` 에서 `enable Codelens` 실행
 
 ## Features
@@ -19,10 +20,9 @@
 
 ![스크린샷 2022-05-14 오후 10 36 05](https://user-images.githubusercontent.com/49119625/168428131-7193f535-fa70-4f16-9dd3-7d2d87b88e87.png)
 
-
 ## Release Notes
 
-### 0.0.3
+### 0.0.0
 
-Initial release...
-
+- 0.0.4
+  - 와플, 젤라또 코드렌증
