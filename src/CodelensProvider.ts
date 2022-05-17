@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { getFilePath } from "./util";
+import { CODE_TEXT_PATHS, PROJECT } from "./constants";
 
 /**
  * CodelensProvider
@@ -14,42 +14,67 @@ export class CodelensProvider implements vscode.CodeLensProvider {
   private codeLenses: vscode.CodeLens[] = [];
   private funcName: RegExp = new RegExp(/window.getCodeText/i);
   private codeTextLabelRegex: RegExp = new RegExp(/\'\w+\.\w+.\w+\'/g);
-  private temps: { gelato: CodeText; waffle: CodeText } = {
+  private _filePaths: { [PROJECT.gelato]: string; [PROJECT.waffle]: string } = {
+    [PROJECT.gelato]: CODE_TEXT_PATHS[PROJECT.gelato],
+    [PROJECT.waffle]: CODE_TEXT_PATHS[PROJECT.waffle],
+  };
+  private _codes: { gelato: CodeText; waffle: CodeText } = {
     gelato: [],
     waffle: [],
+  };
+  private _codesAsString: { gelato: string; waffle: string } = {
+    gelato: "",
+    waffle: "",
   };
   //
   private _onDidChangeCodeLenses: vscode.EventEmitter<void> =
     new vscode.EventEmitter<void>();
   public readonly onDidChangeCodeLenses: vscode.Event<void> =
     this._onDidChangeCodeLenses.event;
-  //
   constructor() {
     this._onDidChangeCodeLenses.fire();
+    this.readCodeTextFilesAndSet();
+
+    // NOTE: 설정이 바뀌면 아래가 실행되나?
+    vscode.workspace.onDidChangeConfiguration((_) => {
+      this._onDidChangeCodeLenses.fire();
+    });
+  }
+  public readCodeTextFilesAndSet() {
     let workspaceFolders: ReadonlyArray<vscode.WorkspaceFolder> | undefined =
       vscode.workspace.workspaceFolders;
     workspaceFolders?.forEach((workspaceFolder: vscode.WorkspaceFolder) => {
-      if (
-        workspaceFolder.name !== "gelato" &&
-        workspaceFolder.name !== "waffle"
-      ) {
+      const { name } = workspaceFolder;
+      if (name !== PROJECT.gelato && name !== PROJECT.waffle) {
         return;
       }
       const filePath = path.join(
         workspaceFolder.uri.fsPath,
-        getFilePath(workspaceFolder.name)
+        this._filePaths[name]
       );
       const jsonFile = fs.readFileSync(filePath, "utf8");
       const jsonData: {
         data: Array<{ label: string; labelKey: string }>;
         modified: boolean;
       } = JSON.parse(jsonFile);
-      this.temps[workspaceFolder.name] = jsonData.data;
+      this._codes[name] = jsonData.data;
+      this._codesAsString[name] = jsonFile;
     });
+  }
 
-    vscode.workspace.onDidChangeConfiguration((_) => {
-      this._onDidChangeCodeLenses.fire();
-    });
+  // NOTE: getter;
+  get codes() {
+    return this._codes;
+  }
+  get codesAsString() {
+    return this._codesAsString;
+  }
+  // NOTE: setter
+  set codes(codes) {
+    this._codes = codes;
+  }
+  set codesAsString(codesAsString) {
+    this._codesAsString = codesAsString;
   }
 
   public provideCodeLenses(
@@ -74,7 +99,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
       ) {
         return [];
       }
-      const codes = this.temps[currentWorkFolder.name];
+      const codes = this._codes[currentWorkFolder.name];
       const text = document.getText();
       let matches;
       while ((matches = this.codeTextLabelRegex.exec(text)) !== null) {
@@ -127,5 +152,17 @@ export class CodelensProvider implements vscode.CodeLensProvider {
       return codeLens;
     }
     return null;
+  }
+
+  public watchJSONFileChange() {
+    const watcher =
+      vscode.workspace.createFileSystemWatcher("**/codeText.json");
+    watcher.onDidChange((e) => {
+      this.readCodeTextFilesAndSet();
+      const currentDocument = vscode.window?.activeTextEditor?.document;
+      if (!currentDocument) {
+        return;
+      }
+    });
   }
 }
