@@ -31,15 +31,16 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     new vscode.EventEmitter<void>();
   public readonly onDidChangeCodeLenses: vscode.Event<void> =
     this._onDidChangeCodeLenses.event;
+
   constructor() {
     this._onDidChangeCodeLenses.fire();
     this.readCodeTextFilesAndSet();
-
-    // NOTE: 설정이 바뀌면 아래가 실행되나?
+    this.watchJSONFileChange();
     vscode.workspace.onDidChangeConfiguration((_) => {
       this._onDidChangeCodeLenses.fire();
     });
   }
+
   public readCodeTextFilesAndSet() {
     let workspaceFolders: ReadonlyArray<vscode.WorkspaceFolder> | undefined =
       vscode.workspace.workspaceFolders;
@@ -147,7 +148,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     token: vscode.CancellationToken
   ) {
     if (
-      vscode.workspace.getConfiguration("code-lens").get("enableCodeLens", true)
+      vscode.workspace.getConfiguration("CodeTextLens").get("enabled", true)
     ) {
       return codeLens;
     }

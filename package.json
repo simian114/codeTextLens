@@ -20,6 +20,7 @@
 		"Other"
 	],
 	"activationEvents": [
+		"onStartupFinished",
 		"onCommand:code-lens.enableCodeLens",
 		"onCommand:code-lens.disableCodeLens",
 		"onCommand:code-lens.codelensAction"
@@ -43,20 +44,8 @@
 			"properties": {
 				"CodeTextLens.enabled": {
 					"type": "boolean",
-					"default": true
-				},
-				"CodeTextLens.gelato": {
-					"type": "string",
-					"default": "/src/util/codeText.json"
-				},
-				"CodeTextLens.waffle": {
-					"type": "string",
-					"default": "/src/utils/codeText.json"
-				},
-				"CodeTextLens.cursorHover": {
-					"type": "boolean",
-					"default": false,
-					"description": "커서를 올리면 나옴"
+					"default": true,
+					"description": "코드렌즈 기능 사용"
 				}
 			}
 		}
