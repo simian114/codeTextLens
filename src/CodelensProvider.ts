@@ -1,19 +1,22 @@
 import * as path from "path";
 import * as fs from "fs";
 import * as vscode from "vscode";
-import { CODE_TEXT_PATHS, PROJECT } from "./constants";
+import {
+  CODE_TEXT_LABEL_KEY_REGEX,
+  CODE_TEXT_PATHS,
+  PROJECT,
+} from "./constants";
+import { getCodeTextPath, getProjectName } from "./util";
 
 /**
  * CodelensProvider
  */
-// eslint-disable-next-line @typescript-eslint/naming-convention
-type obj = Record<string, unknown>;
 type CodeText = Array<{ label: string; labelKey: string }>;
 
 export class CodelensProvider implements vscode.CodeLensProvider {
   private codeLenses: vscode.CodeLens[] = [];
   private funcName: RegExp = new RegExp(/window.getCodeText/i);
-  private codeTextLabelRegex: RegExp = new RegExp(/\'\w+\.\w+.\w+\'/g);
+  private codeTextLabelRegex: RegExp = new RegExp(CODE_TEXT_LABEL_KEY_REGEX);
   private _filePaths: { [PROJECT.gelato]: string; [PROJECT.waffle]: string } = {
     [PROJECT.gelato]: CODE_TEXT_PATHS[PROJECT.gelato],
     [PROJECT.waffle]: CODE_TEXT_PATHS[PROJECT.waffle],
@@ -60,6 +63,23 @@ export class CodelensProvider implements vscode.CodeLensProvider {
       } = JSON.parse(jsonFile);
       this._codes[name] = jsonData.data;
       this._codesAsString[name] = jsonFile;
+    });
+  }
+  public goToCodeText(args: any) {
+    const codeTextPath = getCodeTextPath();
+    vscode.workspace.openTextDocument(codeTextPath).then((doc) => {
+      const project = getProjectName();
+      if (!project) {
+        return;
+      }
+      const indexOf = this.codesAsString[project].indexOf(args);
+      const line = doc.lineAt(doc.positionAt(indexOf).line);
+      const position = new vscode.Position(line.lineNumber, line.lineNumber);
+      vscode.window.showTextDocument(doc).then((editor) => {
+        editor.selections = [new vscode.Selection(position, position)];
+        const range = new vscode.Range(position, position);
+        editor.revealRange(range);
+      });
     });
   }
 

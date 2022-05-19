@@ -8,4 +8,6 @@ const CODE_TEXT_PATHS = {
   [PROJECT.waffle]: "src/utils/codeText.json",
 };
 
-export { PROJECT, CODE_TEXT_PATHS };
+const CODE_TEXT_LABEL_KEY_REGEX = /\'\w+\.\w+.\w+\'/g;
+
+export { PROJECT, CODE_TEXT_PATHS, CODE_TEXT_LABEL_KEY_REGEX };
