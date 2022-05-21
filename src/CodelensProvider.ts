@@ -16,7 +16,7 @@ type CodeText = Array<{ label: string; labelKey: string }>;
 export class CodelensProvider implements vscode.CodeLensProvider {
   private codeLenses: vscode.CodeLens[] = [];
   private funcName: RegExp = new RegExp(/window.getCodeText/i);
-  private codeTextLabelRegex: RegExp = new RegExp(CODE_TEXT_LABEL_KEY_REGEX);
+  private _codeTextLabelRegex: RegExp = new RegExp(CODE_TEXT_LABEL_KEY_REGEX);
   private _filePaths: { [PROJECT.gelato]: string; [PROJECT.waffle]: string } = {
     [PROJECT.gelato]: CODE_TEXT_PATHS[PROJECT.gelato],
     [PROJECT.waffle]: CODE_TEXT_PATHS[PROJECT.waffle],
@@ -39,6 +39,12 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     this._onDidChangeCodeLenses.fire();
     this.readCodeTextFilesAndSet();
     this.watchJSONFileChange();
+    const conf = vscode.workspace.getConfiguration("CodeTextLens");
+    const regex = conf.get("regex") as string;
+    if (regex) {
+      const temp = new RegExp(regex, "g");
+      this._codeTextLabelRegex = temp;
+    }
     vscode.workspace.onDidChangeConfiguration((_) => {
       this._onDidChangeCodeLenses.fire();
     });
@@ -90,12 +96,23 @@ export class CodelensProvider implements vscode.CodeLensProvider {
   get codesAsString() {
     return this._codesAsString;
   }
+  get codeTextLabelRegex() {
+    return this._codeTextLabelRegex;
+  }
   // NOTE: setter
   set codes(codes) {
     this._codes = codes;
   }
   set codesAsString(codesAsString) {
     this._codesAsString = codesAsString;
+  }
+  set codeTextLabelRegex(temp: RegExp) {
+    const conf = vscode.workspace.getConfiguration("CodeTextLens");
+    const regex = conf.get("regex") as string;
+    if (!regex) {
+      return;
+    }
+    this._codeTextLabelRegex = new RegExp(regex, "g");
   }
 
   public provideCodeLenses(
@@ -140,7 +157,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
         const position = new vscode.Position(line.lineNumber, indexOf);
         const range = document.getWordRangeAtPosition(
           position,
-          new RegExp(this.codeTextLabelRegex)
+          new RegExp(this._codeTextLabelRegex)
         );
         if (!range) {
           continue;

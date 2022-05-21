@@ -28,3 +28,8 @@
   - 와플, 젤라또 코드렌증
 - 0.0.5
   - codeText 파일 싱크
+- 0.0.6
+  - enable, disable 버그 수정
+- 0.0.7
+  - toggle 기능 추가
+  - codeText 파싱에 사용할 regex 설정 파일에서 직접 수정 가능

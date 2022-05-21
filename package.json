@@ -2,7 +2,7 @@
 	"name": "code-text-lens",
 	"displayName": "codeTextLens",
 	"description": "codeTextLens",
-	"version": "0.0.6",
+	"version": "0.0.7",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/simian114/codeTextLens"
@@ -23,6 +23,7 @@
 		"onStartupFinished",
 		"onCommand:code-lens.enableCodeLens",
 		"onCommand:code-lens.disableCodeLens",
+		"onCommand:code-lens.toggleCodeLens",
 		"onCommand:code-lens.codelensAction"
 	],
 	"main": "./dist/extension.js",
@@ -37,6 +38,11 @@
 				"title": "Disable Codelens",
 				"command": "code-lens.disableCodeLens",
 				"category": "codeText"
+			},
+			{
+				"title": "toggle Codelens",
+				"command": "code-lens.toggleCodeLens",
+				"category": "codeText"
 			}
 		],
 		"configuration": {
@@ -46,6 +52,11 @@
 					"type": "boolean",
 					"default": true,
 					"description": "코드렌즈 기능 사용"
+				},
+				"CodeTextLens.regex": {
+					"type": "string",
+					"default": "\\'\\w+\\.\\w+\\-*\\w+\\.\\w+\\'",
+					"markdownDescription": "codeText 파싱에 사용할 정규식을 입력해주세요.\n기본"
 				}
 			}
 		}
