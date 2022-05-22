@@ -33,3 +33,5 @@
 - 0.0.7
   - toggle 기능 추가
   - codeText 파싱에 사용할 regex 설정 파일에서 직접 수정 가능
+- 0.0.8
+  - strapi 추가

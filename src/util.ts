@@ -1,5 +1,7 @@
 import * as vscode from "vscode";
 import * as path from "path";
+import * as fs from "fs";
+import { stringify } from "querystring";
 
 const getCurrentWorkspace = (): vscode.WorkspaceFolder | undefined => {
   const root = vscode.window?.activeTextEditor?.document?.uri;
@@ -7,6 +9,12 @@ const getCurrentWorkspace = (): vscode.WorkspaceFolder | undefined => {
     return undefined;
   }
   return vscode.workspace.getWorkspaceFolder(root);
+};
+
+const readCodeText = () => {
+  const filePath = getCodeTextPath();
+  const data = fs.readFileSync(filePath, "utf-8");
+  return data;
 };
 
 const getFilePath = (name: string): string => {
@@ -53,4 +61,10 @@ const getCodeTextPath = (): string => {
   return filePath;
 };
 
-export { getFilePath, getProjectName, getCodeTextPath, getCurrentWorkspace };
+export {
+  getFilePath,
+  getProjectName,
+  getCodeTextPath,
+  getCurrentWorkspace,
+  readCodeText,
+};

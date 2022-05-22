@@ -5,12 +5,15 @@ import {
   Disposable,
   workspace,
 } from "vscode";
+import * as vscode from "vscode";
 import { CodelensProvider } from "./CodelensProvider";
+import CodeTextHandler from "./CodeTextHandler";
 
 let disposables: Disposable[] = [];
 
 export function activate(context: ExtensionContext) {
   const codelensProvider = new CodelensProvider();
+  const codeTextHandler = new CodeTextHandler();
 
   languages.registerCodeLensProvider("typescriptreact", codelensProvider);
 
@@ -28,6 +31,9 @@ export function activate(context: ExtensionContext) {
   commands.registerCommand("code-lens.toggleCodeLens", (args: any) => {
     const conf = workspace.getConfiguration("CodeTextLens").get("enabled");
     workspace.getConfiguration("CodeTextLens").update("enabled", !conf, true);
+  });
+  commands.registerCommand("strapi-handler", (args: any) => {
+    codeTextHandler.handle();
   });
 }
 
