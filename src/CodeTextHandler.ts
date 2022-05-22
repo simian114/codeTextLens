@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import * as fs from "fs";
 import { getCodeTextPath, getCurrentWorkspace, readCodeText } from "./util";
 import { faker } from "@faker-js/faker";
+import clipboard from "clipboardy";
 
 const items: vscode.QuickPickItem[] = [
   {
@@ -82,21 +83,27 @@ class CodeTextHandler {
     if (!json) {
       return;
     }
-    let labelKey = faker.name
+    let uniqueKey = faker.name
       .findName()
+      .toLocaleLowerCase()
       .replaceAll(" ", "")
       .replaceAll(".", "");
 
     while (true) {
-      const existed = json.data.find((d) => d.labelKey === labelKey);
+      const existed = json.data.find((d) => d.labelKey === uniqueKey);
       if (!existed) {
         break;
       }
-      labelKey = faker.name.findName().replaceAll(" ", "").replaceAll(".", "");
+      uniqueKey = faker.name
+        .findName()
+        .toLocaleLowerCase()
+        .replaceAll(" ", "")
+        .replaceAll(".", "");
     }
+    const labelKey = [labelKeyPrefix, uniqueKey].join(".");
     json.data.push({
       label: label || "",
-      labelKey: [labelKeyPrefix, labelKey].join("."),
+      labelKey,
     });
     json.modified = true;
 
@@ -107,6 +114,8 @@ class CodeTextHandler {
         vscode.window.showErrorMessage("label 추가에 실패했습니다.");
         return;
       }
+      // clipboard.writeSync(labelKey);
+      clipboard.writeSync(`window.getCodeText("${labelKey}")`);
       vscode.window.showInformationMessage("새로운 label이 추가되었습니다.");
     });
   }

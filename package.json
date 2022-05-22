@@ -2,7 +2,7 @@
 	"name": "code-text-lens",
 	"displayName": "codeTextLens",
 	"description": "codeTextLens",
-	"version": "0.0.8",
+	"version": "0.0.9",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/simian114/codeTextLens"
@@ -94,5 +94,8 @@
 		"typescript": "^4.6.4",
 		"webpack": "^5.70.0",
 		"webpack-cli": "^4.9.2"
+	},
+	"dependencies": {
+		"clipboardy": "^3.0.0"
 	}
 }
