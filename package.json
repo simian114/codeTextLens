@@ -2,7 +2,7 @@
 	"name": "code-text-lens",
 	"displayName": "codeTextLens",
 	"description": "codeTextLens",
-	"version": "0.0.9",
+	"version": "0.1.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/simian114/codeTextLens"
@@ -61,8 +61,18 @@
 				},
 				"CodeTextLens.regex": {
 					"type": "string",
-					"default": "\\'\\w+\\.\\w+\\-*\\w+\\.\\w+\\'",
+					"default": "[\\' | \"]\\w+\\.\\w+\\-*\\w+\\.\\w+[\\' | \"]",
 					"markdownDescription": "codeText 파싱에 사용할 정규식을 입력해주세요.\n기본"
+				},
+				"CodeTextLens.checkCodeTextFunction": {
+					"type": "boolean",
+					"default": false,
+					"markdownDescription": "window.getCodeText 함수가 사용된 라인만 검사"
+				},
+				"CodeTextLens.languages": {
+					"type": "string",
+					"default": "typescript, typescriptreact, json",
+					"markdownDescription": "적용할 파일 형식을 , 로 분리해서 적어주세요"
 				}
 			}
 		}

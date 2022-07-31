@@ -15,7 +15,9 @@ type CodeText = Array<{ label: string; labelKey: string }>;
 
 export class CodelensProvider implements vscode.CodeLensProvider {
   private codeLenses: vscode.CodeLens[] = [];
-  private funcName: RegExp = new RegExp(/window.getCodeText/i);
+  private _funcName: RegExp = new RegExp(/window.getCodeText/i);
+  private _checkGetCodeTextFunction: boolean =
+    !!vscode.workspace.getConfiguration("CodeTextLens")?.checkCodeTextFunction;
   private _codeTextLabelRegex: RegExp = new RegExp(CODE_TEXT_LABEL_KEY_REGEX);
   private _filePaths: { [PROJECT.gelato]: string; [PROJECT.waffle]: string } = {
     [PROJECT.gelato]: CODE_TEXT_PATHS[PROJECT.gelato],
@@ -124,7 +126,7 @@ export class CodelensProvider implements vscode.CodeLensProvider {
     ) {
       this.codeLenses = [];
       const root = vscode.window?.activeTextEditor?.document?.uri;
-      if (!root) {
+      if (!root || root?.path.includes("codeText.json")) {
         return [];
       }
       const currentWorkFolder = vscode.workspace.getWorkspaceFolder(root);
@@ -148,8 +150,9 @@ export class CodelensProvider implements vscode.CodeLensProvider {
           continue;
         }
         if (
-          !this.funcName.test(line.text) &&
-          !this.funcName.test(lineAbove.text)
+          this._checkGetCodeTextFunction &&
+          !this._funcName.test(line.text) &&
+          !this._funcName.test(lineAbove.text)
         ) {
           continue;
         }
@@ -162,14 +165,14 @@ export class CodelensProvider implements vscode.CodeLensProvider {
         if (!range) {
           continue;
         }
-        const trimmed = matches[0].replace(/\'/g, "");
+        const trimmed = matches[0].replace(/^['|"]|['|"]$/g, "");
         const label = codes.find((code) => code.labelKey === trimmed);
         if (!label) {
           continue;
         }
         const command = new vscode.CodeLens(range, {
           title: `${label.label}`,
-          tooltip: "하하호호",
+          tooltip: "",
           command: "code-lens.codelensAction",
           arguments: [label.label],
         });
