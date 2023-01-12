@@ -1,7 +1,7 @@
-import * as vscode from "vscode";
-import * as path from "path";
-import * as fs from "fs";
-import { stringify } from "querystring";
+import * as fs from 'fs';
+import * as path from 'path';
+import * as vscode from 'vscode';
+import { CODE_TEXT_PATHS } from './constants';
 
 const getCurrentWorkspace = (): vscode.WorkspaceFolder | undefined => {
   const root = vscode.window?.activeTextEditor?.document?.uri;
@@ -11,60 +11,57 @@ const getCurrentWorkspace = (): vscode.WorkspaceFolder | undefined => {
   return vscode.workspace.getWorkspaceFolder(root);
 };
 
+const isValidWorkFolder = () => {
+  const root = vscode.window?.activeTextEditor?.document?.uri;
+  if (!root || root?.path.includes(CODE_TEXT_PATHS)) {
+    return false;
+  }
+  const currentWorkFolder = vscode.workspace.getWorkspaceFolder(root);
+  if (!currentWorkFolder) {
+    return false;
+  }
+  if (
+    currentWorkFolder.name !== 'gelato' &&
+    currentWorkFolder.name !== 'waffle'
+  ) {
+    return false;
+  }
+  return true;
+};
+
 const readCodeText = () => {
   const filePath = getCodeTextPath();
-  const data = fs.readFileSync(filePath, "utf-8");
+  const data = fs.readFileSync(filePath, 'utf-8');
   return data;
 };
 
-const getFilePath = (name: string): string => {
-  if (name === "gelato") {
-    return (
-      vscode.workspace.getConfiguration("CodeTextLens").get("gelato") ||
-      "src/util/codeText.json"
-    );
-  } else if (name === "waffle") {
-    return (
-      vscode.workspace.getConfiguration("CodeTextLens").get("waffle") ||
-      "src/utils/codeText.json"
-    );
-  }
-  return "";
-};
-
-const getProjectName = (): "" | "gelato" | "waffle" => {
+const getProjectName = (): '' | 'gelato' | 'waffle' => {
   const root = vscode.window?.activeTextEditor?.document?.uri;
   if (!root) {
-    return "";
+    return '';
   }
   const currentWorkFolder = vscode.workspace.getWorkspaceFolder(root);
   if (
     !currentWorkFolder ||
-    (currentWorkFolder.name !== "gelato" && currentWorkFolder.name !== "waffle")
+    (currentWorkFolder.name !== 'gelato' && currentWorkFolder.name !== 'waffle')
   ) {
-    return "";
+    return '';
   }
   return currentWorkFolder.name;
 };
 
 const getCodeTextPath = (): string => {
-  const project = getProjectName();
   const currentWorkFolder = getCurrentWorkspace();
-  if (!project || !currentWorkFolder) {
-    return "";
+  if (!currentWorkFolder) {
+    return '';
   }
-  const filePath = path.join(
-    currentWorkFolder.uri.fsPath,
-    getFilePath(project)
-  );
-
-  return filePath;
+  return path.join(currentWorkFolder.uri.fsPath, CODE_TEXT_PATHS);
 };
 
 export {
-  getFilePath,
   getProjectName,
   getCodeTextPath,
   getCurrentWorkspace,
   readCodeText,
+  isValidWorkFolder,
 };

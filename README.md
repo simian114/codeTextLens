@@ -37,3 +37,9 @@
   - strapi 추가
 - 0.0.9
   - strapi 추가 에러 수정 및 클립보드에 복사
+- 0.1.1
+  - strapi v3 -> v4 대응
+  - `src/\*\*/codeText.json` 의 파일 변화를 감지해서 `codeText.json` 데이터를 서버로부터 새로 불러옴
+    - 또는 `command palette -> codeText: Reload CodeText.json` 로 직접 불러올 수도 있음.
+  - `project root/codeLens.json` 에 데이터 보관
+    - gitignore 에 추가해야함.
